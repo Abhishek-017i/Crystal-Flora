@@ -1,0 +1,75 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  phone        String?
+  passwordHash String
+  role         String   @default("buyer")
+  createdAt    DateTime @default(now())
+  orders       Order[]
+  reviews      Review[]
+}
+
+model Category {
+  id       String    @id @default(cuid())
+  name     String
+  slug     String    @unique
+  products Product[]
+}
+
+model Product {
+  id             String      @id @default(cuid())
+  name           String
+  description    String
+  price          Float
+  discountedPrice Float?
+  categoryId     String
+  category       Category    @relation(fields: [categoryId], references: [id])
+  images         String[]
+  isHighlighted  Boolean     @default(false)
+  createdAt      DateTime    @default(now())
+  orderItems     OrderItem[]
+  reviews        Review[]
+}
+
+model Order {
+  id          String      @id @default(cuid())
+  userId      String
+  user        User        @relation(fields: [userId], references: [id])
+  totalAmount Float
+  status      String      @default("pending")
+  addressLine String
+  city        String
+  pincode     String
+  createdAt   DateTime    @default(now())
+  items       OrderItem[]
+}
+
+model OrderItem {
+  id           String  @id @default(cuid())
+  orderId      String
+  order        Order   @relation(fields: [orderId], references: [id])
+  productId    String
+  product      Product @relation(fields: [productId], references: [id])
+  quantity     Int
+  priceAtTime  Float
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  rating    Int
+  text      String
+  createdAt DateTime @default(now())
+}
