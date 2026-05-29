@@ -16,6 +16,7 @@ model User {
   createdAt    DateTime @default(now())
   orders       Order[]
   reviews      Review[]
+  wishlists    Wishlist[]
 }
 
 model Category {
@@ -38,6 +39,7 @@ model Product {
   createdAt      DateTime    @default(now())
   orderItems     OrderItem[]
   reviews        Review[]
+  wishlists      Wishlist[]
 }
 
 model Order {
@@ -72,4 +74,15 @@ model Review {
   rating    Int
   text      String
   createdAt DateTime @default(now())
+}
+
+model Wishlist {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId])
 }
