@@ -4,12 +4,14 @@ import { useState } from "react"
 import Image from "next/image"
 import { Search, ShoppingBag, X } from "lucide-react"
 import { useCartStore } from '@/lib/store'
+import { useRouter } from 'next/navigation'
 
 export function Navbar() {
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const cartItems = useCartStore(state => state.items)
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0)
+  const router = useRouter()
 
   return (
     <header className="sticky top-0 z-50 w-full bg-secondary/95 backdrop-blur-sm border-b border-border">
@@ -68,12 +70,14 @@ export function Navbar() {
           </div>
 
           {/* Cart */}
-          <button className="relative p-2 text-foreground hover:text-primary transition-colors">
+          <button 
+            onClick={() => router.push('/cart')}
+            className="relative p-2 text-foreground hover:text-primary transition-colors">
             <ShoppingBag className="w-5 h-5" />
             {cartCount > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 w-5 h-5 flex items-center justify-center text-[10px] font-semibold text-primary-foreground bg-primary rounded-full">
-                {cartCount}
-              </span>
+            <span className="absolute -top-0.5 -right-0.5 w-5 h-5 flex items-center justify-center text-[10px] font-semibold text-primary-foreground bg-primary rounded-full">
+              {cartCount}
+            </span>
             )}
           </button>
         </div>

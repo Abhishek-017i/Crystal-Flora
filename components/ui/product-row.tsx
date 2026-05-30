@@ -3,6 +3,7 @@ import { useCartStore } from '@/lib/store'
 import { useState } from "react"
 import Image from "next/image"
 import { Heart, ShoppingCart, ChevronRight } from "lucide-react"
+import { useRouter } from 'next/navigation'
 
 type Product = {
   id: string
@@ -23,7 +24,8 @@ type ProductRowProps = {
 export function ProductCard({ product }: { product: Product }) {
   const [isWishlisted, setIsWishlisted] = useState(product.isWishlisted || false)
   const [isAdding, setIsAdding] = useState(false)
-
+  const router = useRouter()
+  
   const handleAddToCart = () => {
   setIsAdding(true)
   useCartStore.getState().addItem({
@@ -38,7 +40,10 @@ export function ProductCard({ product }: { product: Product }) {
 }
 
   return (
-    <div className="group relative flex-shrink-0 w-40 md:w-52">
+    <div 
+      className="group relative flex-shrink-0 w-40 md:w-52 cursor-pointer"
+      onClick={() => router.push(`/products/${product.id}`)}
+    >
       {/* Product Image */}
       <div className="relative aspect-square rounded-2xl overflow-hidden bg-muted shadow-sm group-hover:shadow-lg transition-shadow duration-300">
         <Image
@@ -64,7 +69,10 @@ export function ProductCard({ product }: { product: Product }) {
 
         {/* Wishlist Heart */}
         <button
-          onClick={() => setIsWishlisted(!isWishlisted)}
+          onClick={(e) => {
+          e.stopPropagation()
+          setIsWishlisted(!isWishlisted)
+        }}
           className="absolute top-2 right-2 w-8 h-8 flex items-center justify-center bg-card/80 backdrop-blur-sm rounded-full shadow-sm hover:scale-110 transition-transform"
           aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
         >
@@ -90,7 +98,10 @@ export function ProductCard({ product }: { product: Product }) {
           </span>
         </div>
         <button
-          onClick={handleAddToCart}
+          onClick={(e) => {
+            e.stopPropagation()
+            handleAddToCart()
+          }}
           className={`w-full mt-2 py-2 px-4 text-xs font-semibold rounded-full flex items-center justify-center gap-1.5 transition-all duration-300 ${
             isAdding
               ? "bg-olive-green text-white scale-95"
@@ -106,6 +117,7 @@ export function ProductCard({ product }: { product: Product }) {
 }
 
 export function ProductRow({ title, products }: ProductRowProps) {
+  const router = useRouter()
   return (
     <section className="py-6">
       {/* Header */}
@@ -113,7 +125,9 @@ export function ProductRow({ title, products }: ProductRowProps) {
         <h3 className="font-serif text-lg md:text-xl font-semibold text-foreground">
           {title}
         </h3>
-        <button className="flex items-center gap-1 text-sm font-medium text-primary hover:text-primary/80 transition-colors group">
+        <button 
+          onClick={() => router.push(`/products?category=${title.toLowerCase().replace(' ', '-')}`)}
+          className="flex items-center gap-1 text-sm font-medium text-primary hover:text-primary/80 transition-colors group">
           View More
           <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
         </button>
