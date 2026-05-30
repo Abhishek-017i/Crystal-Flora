@@ -21,6 +21,7 @@ export function HeroCarousel() {
     fetch('/api/products')
       .then(res => res.json())
       .then(data => {
+        if (!Array.isArray(data)) return
         const highlighted = data.filter((p: Slide & { isHighlighted: boolean }) => p.isHighlighted)
         setSlides(highlighted.length > 0 ? highlighted : data.slice(0, 4))
       })

@@ -32,11 +32,17 @@ export default function HomePage() {
   useEffect(() => {
     fetch('/api/products')
       .then(res => res.json())
-      .then(data => setProducts(data))
+      .then(data => {
+        if (!Array.isArray(data)) return
+        setProducts(data)
+      })
 
     fetch('/api/categories')
       .then(res => res.json())
-      .then(data => setCategories(data))
+      .then(data => {
+        if (!Array.isArray(data)) return
+        setCategories(data)
+      })
   }, [])
 
   const getProductsByCategory = (categoryId: string) => {
