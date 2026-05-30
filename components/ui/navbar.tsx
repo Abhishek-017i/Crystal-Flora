@@ -46,17 +46,31 @@ export function Navbar() {
                 placeholder="Search products..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => {
+                if (e.key === 'Enter' && searchQuery.trim()) {
+                  router.push(`/products?search=${encodeURIComponent(searchQuery.trim())}`)
+                  setIsSearchOpen(false)
+                  setSearchQuery("")
+                }
+                }}
                 className="w-full h-9 pl-3 pr-8 text-sm bg-background border border-border rounded-full focus:outline-none focus:ring-2 focus:ring-primary/50"
               />
               {isSearchOpen && (
                 <button
                   onClick={() => {
+                  if (isSearchOpen && searchQuery.trim()) {
+                    router.push(`/products?search=${encodeURIComponent(searchQuery.trim())}`)
                     setIsSearchOpen(false)
                     setSearchQuery("")
+                  } 
+                  else {
+                    setIsSearchOpen(!isSearchOpen)
+                  }
                   }}
-                  className="absolute right-10 p-1 text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <X className="w-4 h-4" />
+                  className="p-2 text-foreground hover:text-primary transition-colors"
+                  aria-label="Search"
+                  >
+                  <Search className="w-5 h-5" />
                 </button>
               )}
             </div>
