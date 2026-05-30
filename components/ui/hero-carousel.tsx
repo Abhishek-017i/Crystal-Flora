@@ -4,52 +4,47 @@ import { useState, useEffect, useCallback } from "react"
 import Image from "next/image"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 
-const heroSlides = [
-  {
-    id: 1,
-    image: "https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=800&q=80",
-    title: "Spring Bouquet Collection",
-    subtitle: "Handcrafted with love",
-    price: "₹1,299",
-  },
-  {
-    id: 2,
-    image: "https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=800&q=80",
-    title: "Fabric Flower Arrangements",
-    subtitle: "Blooms that last forever",
-    price: "₹899",
-  },
-  {
-    id: 3,
-    image: "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=800&q=80",
-    title: "Crystal Jewelry Sets",
-    subtitle: "Elegant keepsakes",
-    price: "₹599",
-  },
-  {
-    id: 4,
-    image: "https://images.unsplash.com/photo-1596944924616-7b38e7cfac36?w=800&q=80",
-    title: "Hair Accessories",
-    subtitle: "Delicate handmade clips",
-    price: "₹299",
-  },
-]
+interface Slide {
+  id: string
+  images: string[]
+  name: string
+  description: string
+  discountedPrice: number | null
+  price: number
+}
 
 export function HeroCarousel() {
+  const [slides, setSlides] = useState<Slide[]>([])
   const [currentSlide, setCurrentSlide] = useState(0)
 
-  const nextSlide = useCallback(() => {
-    setCurrentSlide((prev) => (prev + 1) % heroSlides.length)
+  useEffect(() => {
+    fetch('/api/products')
+      .then(res => res.json())
+      .then(data => {
+        const highlighted = data.filter((p: Slide & { isHighlighted: boolean }) => p.isHighlighted)
+        setSlides(highlighted.length > 0 ? highlighted : data.slice(0, 4))
+      })
   }, [])
 
+  const nextSlide = useCallback(() => {
+    setCurrentSlide((prev) => (prev + 1) % (slides.length || 1))
+  }, [slides.length])
+
   const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length)
+    setCurrentSlide((prev) => (prev - 1 + (slides.length || 1)) % (slides.length || 1))
   }
 
   useEffect(() => {
+    if (slides.length === 0) return
     const interval = setInterval(nextSlide, 4000)
     return () => clearInterval(interval)
-  }, [nextSlide])
+  }, [nextSlide, slides.length])
+
+  if (slides.length === 0) {
+    return (
+      <section className="relative w-full aspect-[4/5] md:aspect-[16/9] bg-secondary animate-pulse" />
+    )
+  }
 
   return (
     <section className="relative w-full overflow-hidden">
@@ -57,32 +52,30 @@ export function HeroCarousel() {
         className="flex transition-transform duration-500 ease-out"
         style={{ transform: `translateX(-${currentSlide * 100}%)` }}
       >
-        {heroSlides.map((slide) => (
+        {slides.map((slide) => (
           <div
             key={slide.id}
             className="relative w-full flex-shrink-0 aspect-[4/5] md:aspect-[16/9]"
           >
             <Image
-              src={slide.image}
-              alt={slide.title}
+              src={slide.images[0] ?? '/images/logo.png'}
+              alt={slide.name}
               fill
+              sizes="100vw"
               className="object-cover"
-              priority={slide.id === 1}
+              priority
             />
-            {/* Blush Pink Gradient Overlay */}
             <div className="absolute inset-0 bg-gradient-to-t from-primary/60 via-primary/20 to-transparent" />
-            
-            {/* Content */}
             <div className="absolute inset-0 flex flex-col justify-end p-6 pb-12">
               <span className="text-primary-foreground/90 text-sm font-medium mb-1">
-                {slide.subtitle}
+                {slide.description}
               </span>
               <h2 className="font-serif text-2xl md:text-4xl text-primary-foreground font-semibold mb-2 text-balance">
-                {slide.title}
+                {slide.name}
               </h2>
               <div className="flex items-center gap-4">
                 <span className="text-primary-foreground text-lg font-semibold">
-                  {slide.price}
+                  ₹{slide.discountedPrice ?? slide.price}
                 </span>
                 <button className="px-6 py-2.5 bg-primary-foreground text-primary text-sm font-semibold rounded-full hover:bg-primary-foreground/90 transition-all duration-300 hover:scale-105 shadow-lg">
                   Shop Now
@@ -93,7 +86,6 @@ export function HeroCarousel() {
         ))}
       </div>
 
-      {/* Navigation Arrows */}
       <button
         onClick={prevSlide}
         className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center bg-primary-foreground/80 rounded-full text-foreground hover:bg-primary-foreground transition-colors shadow-md"
@@ -109,9 +101,8 @@ export function HeroCarousel() {
         <ChevronRight className="w-5 h-5" />
       </button>
 
-      {/* Dots Indicator */}
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-        {heroSlides.map((_, index) => (
+        {slides.map((_, index) => (
           <button
             key={index}
             onClick={() => setCurrentSlide(index)}

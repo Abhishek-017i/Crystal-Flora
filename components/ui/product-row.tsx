@@ -1,11 +1,11 @@
 "use client"
-
+import { useCartStore } from '@/lib/store'
 import { useState } from "react"
 import Image from "next/image"
 import { Heart, ShoppingCart, ChevronRight } from "lucide-react"
 
 type Product = {
-  id: number
+  id: string
   name: string
   image: string
   originalPrice: number
@@ -25,9 +25,17 @@ export function ProductCard({ product }: { product: Product }) {
   const [isAdding, setIsAdding] = useState(false)
 
   const handleAddToCart = () => {
-    setIsAdding(true)
-    setTimeout(() => setIsAdding(false), 500)
-  }
+  setIsAdding(true)
+  useCartStore.getState().addItem({
+    id: product.id,
+    name: product.name,
+    price: product.originalPrice,
+    discountedPrice: product.discountedPrice,
+    image: product.image,
+    quantity: 1
+  })
+  setTimeout(() => setIsAdding(false), 500)
+}
 
   return (
     <div className="group relative flex-shrink-0 w-40 md:w-52">

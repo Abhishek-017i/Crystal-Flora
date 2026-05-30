@@ -40,6 +40,9 @@ model Product {
   orderItems     OrderItem[]
   reviews        Review[]
   wishlists      Wishlist[]
+  weightGrams Int     @default(200)
+  stock       Int     @default(10)
+  isInStock   Boolean @default(true)
 }
 
 model Order {

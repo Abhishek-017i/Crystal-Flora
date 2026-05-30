@@ -3,11 +3,13 @@
 import { useState } from "react"
 import Image from "next/image"
 import { Search, ShoppingBag, X } from "lucide-react"
+import { useCartStore } from '@/lib/store'
 
 export function Navbar() {
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
-  const cartCount = 3
+  const cartItems = useCartStore(state => state.items)
+  const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0)
 
   return (
     <header className="sticky top-0 z-50 w-full bg-secondary/95 backdrop-blur-sm border-b border-border">
