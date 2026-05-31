@@ -26,7 +26,7 @@ export async function GET(request: Request) {
       take: 5
     })
 
-    const topProductIds = topProducts.map(p => p.productId)
+    const topProductIds = topProducts.map((p: { productId: string; _sum: { quantity: number | null } }) => p.productId)
     const topProductDetails = await prisma.product.findMany({
       where: { id: { in: topProductIds } }
     })
