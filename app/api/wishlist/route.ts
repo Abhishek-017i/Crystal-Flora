@@ -4,7 +4,7 @@ import { getUser } from '@/lib/auth'
 
 export async function DELETE(
   request: Request,
-  { params }: { params: Promise<{ productId: string }> }
+  { params }: { params: Promise<Record<string, string>> }
 ) {
   try {
     const decoded = getUser(request)
