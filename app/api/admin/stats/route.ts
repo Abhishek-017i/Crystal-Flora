@@ -40,7 +40,7 @@ export async function GET(request: Request) {
       totalRevenue: totalRevenue._sum.totalAmount ?? 0,
       pendingOrders,
       topProducts: topProducts.map((tp: { productId: string; _sum: { quantity: number | null } }) => ({
-        ...topProductDetails.find(p => p.id === tp.productId),
+        ...topProductDetails.find((p: { id: string }) => p.id === tp.productId),
         totalSold: tp._sum.quantity
       }))
     })
