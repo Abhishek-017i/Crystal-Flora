@@ -2,6 +2,11 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { isAdmin } from '@/lib/auth'
 
+interface OrderItemGroup {
+  productId: string
+  _sum: { quantity: number | null }
+}
+
 export async function GET(request: Request) {
   try {
     const admin = isAdmin(request)
@@ -29,14 +34,14 @@ export async function GET(request: Request) {
       take: 5
     })
 
-    const topProductIds: string[] = topOrderItems.map(item => item.productId)
+    const topProductIds: string[] = (topOrderItems as OrderItemGroup[]).map(item => item.productId)
     
     const topProductDetails = await prisma.product.findMany({
       where: { id: { in: topProductIds } }
     })
 
-    const topProducts = topOrderItems.map(item => {
-      const product = topProductDetails.find(p => p.id === item.productId)
+    const topProducts = (topOrderItems as OrderItemGroup[]).map(item => {
+      const product = topProductDetails.find((p: { id: string; name: string }) => p.id === item.productId)
       return {
         id: item.productId,
         name: product?.name ?? 'Unknown',
