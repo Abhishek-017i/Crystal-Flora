@@ -39,7 +39,7 @@ export async function GET(request: Request) {
       totalOrders,
       totalRevenue: totalRevenue._sum.totalAmount ?? 0,
       pendingOrders,
-      topProducts: topProducts.map(tp => ({
+      topProducts: topProducts.map((tp: { productId: string; _sum: { quantity: number | null } }) => ({
         ...topProductDetails.find(p => p.id === tp.productId),
         totalSold: tp._sum.quantity
       }))
