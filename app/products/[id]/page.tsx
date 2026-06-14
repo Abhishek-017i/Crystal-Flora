@@ -1,3 +1,6 @@
-export default function ProductPage() {
-  return <div>Coming soon</div>
+import { ProductDetail } from '@/components/ui/product-detail'
+
+export default function Page() {
+  return <ProductDetail />
 }
+
