@@ -7,6 +7,17 @@ export interface Review {
   verified: boolean
 }
 
+export interface RelatedProduct {
+  id: string
+  name: string
+  price: number
+  discountedPrice: number | null
+  images: string[]
+  image?: string
+  originalPrice?: number
+  sale?: boolean
+}
+
 export const product = {
   id: 'prod1',
   name: 'Crystal Bracelet',
