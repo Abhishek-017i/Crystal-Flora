@@ -7,6 +7,7 @@ import { Heart, ShoppingCart, ArrowLeft } from 'lucide-react'
 import { useCartStore } from '@/lib/store'
 import { Navbar } from '@/components/ui/navbar'
 import { BottomNav } from '@/components/ui/bottom-nav'
+import { Suspense } from 'react'
 
 interface Product {
   id: string
@@ -17,8 +18,7 @@ interface Product {
   isInStock: boolean
   createdAt: string
 }
-
-export default function ProductsPage() {
+function ProductsContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const search = searchParams.get('search')
@@ -119,5 +119,13 @@ export default function ProductsPage() {
       </main>
       <BottomNav />
     </div>
+  )
+}
+
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-background animate-pulse" />}>
+      <ProductsContent />
+    </Suspense>
   )
 }
