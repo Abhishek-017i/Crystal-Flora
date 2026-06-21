@@ -4,6 +4,7 @@ import { useState } from "react"
 import Image from "next/image"
 import { Heart, ShoppingCart, ChevronRight } from "lucide-react"
 import { useRouter } from 'next/navigation'
+import { useWishlistStore } from '@/lib/store'
 
 type Product = {
   id: string
@@ -21,10 +22,11 @@ type ProductRowProps = {
   products: Product[]
 }
 
-export function ProductCard({ product }: { product: Product }) {
-  const [isWishlisted, setIsWishlisted] = useState(product.isWishlisted || false)
+export function ProductCard({ product }: { product: Product }) {//--------------------
   const [isAdding, setIsAdding] = useState(false)
   const router = useRouter()
+  const { isWishlisted, addItem, removeItem } = useWishlistStore()
+  const wishlisted = isWishlisted(product.id)
   
   const handleAddToCart = () => {
   setIsAdding(true)
@@ -70,15 +72,36 @@ export function ProductCard({ product }: { product: Product }) {
         {/* Wishlist Heart */}
         <button
           onClick={(e) => {
-          e.stopPropagation()
-          setIsWishlisted(!isWishlisted)
-        }}
+            e.stopPropagation()
+            const token = localStorage.getItem('token')
+            if (!token) {
+              window.location.href = '/login'
+              return
+            }
+            if (wishlisted) {
+              fetch(`/api/wishlist/${product.id}`, {
+                method: 'DELETE',
+                headers: { authorization: `Bearer ${token}` }
+              })
+              removeItem(product.id)
+            } else {
+              fetch('/api/wishlist', {
+                method: 'POST',
+                headers: { 
+                  'Content-Type': 'application/json',
+                  authorization: `Bearer ${token}` 
+                },
+                body: JSON.stringify({ productId: product.id })
+              })
+              addItem(product.id)
+            }
+          }}
           className="absolute top-2 right-2 w-8 h-8 flex items-center justify-center bg-card/80 backdrop-blur-sm rounded-full shadow-sm hover:scale-110 transition-transform"
           aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
         >
           <Heart
             className={`w-4 h-4 transition-colors ${
-              isWishlisted ? "fill-primary text-primary" : "text-muted-foreground"
+              wishlisted ? "fill-primary text-primary" : "text-muted-foreground"
             }`}
           />
         </button>

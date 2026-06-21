@@ -1,7 +1,8 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { Share2, Heart } from 'lucide-react'
+import { useWishlistStore } from '@/lib/store'
 
 export function PhotoCarousel({ 
   images, 
@@ -14,9 +15,25 @@ export function PhotoCarousel({
   productId: string
   isWishlisted?: boolean
 }) {
-  const [active, setActive] = useState(0)
-  const [wishlisted, setWishlisted] = useState(initialWishlisted)
+  const [active, setActive] = useState(0)   //----------------------------
   const scrollRef = useRef(null)
+  const { isWishlisted, addItem, removeItem, setItems } = useWishlistStore()
+  
+  const wishlisted = isWishlisted(productId)
+  useEffect(() => {
+    const token = localStorage.getItem('token')
+    if (!token) return
+    fetch('/api/wishlist', {
+      headers: { authorization: `Bearer ${token}` }
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (!Array.isArray(data)) return
+        setItems(data.map((item: any) => item.productId))
+      })
+      .catch(() => {})
+  }, [productId])
+
   function handleScroll() {
     const el = scrollRef.current
     if (!el) return
@@ -61,7 +78,7 @@ export function PhotoCarousel({
                           method: 'DELETE',
                           headers: { authorization: `Bearer ${token}` }
                         })
-                        setWishlisted(false)
+                        removeItem(productId)
                       } else {
                         await fetch('/api/wishlist', {
                           method: 'POST',
@@ -71,7 +88,7 @@ export function PhotoCarousel({
                           },
                           body: JSON.stringify({ productId })
                         })
-                        setWishlisted(true)
+                        addItem(productId)
                       }
                     }}
                     className="absolute bottom-3 right-3 w-9 h-9 flex items-center justify-center bg-white/80 backdrop-blur-sm rounded-full shadow-sm"
