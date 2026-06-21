@@ -34,7 +34,6 @@ export default function RootLayout({
   return (
     <html lang="en" className="bg-background">
       <body className={`${dmSans.variable} ${playfair.variable} font-sans antialiased`}>
-        // inside body:
         <WishlistProvider />
         {children}                
       </body>
