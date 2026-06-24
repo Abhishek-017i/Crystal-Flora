@@ -5,6 +5,7 @@ import { Eye, EyeOff } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useRouter } from 'next/navigation'
+import { signIn } from 'next-auth/react'
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
@@ -169,6 +170,7 @@ export default function LoginPage() {
         {/* Google Sign In */}
         <Button
           type="button"
+          onClick={() => signIn('google', { callbackUrl: '/' })}
           variant="outline"
           className="w-full h-12 border-border bg-card hover:bg-secondary rounded-xl font-medium text-foreground transition-all"
         >
