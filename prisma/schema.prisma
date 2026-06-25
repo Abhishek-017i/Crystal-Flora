@@ -17,6 +17,9 @@ model User {
   orders       Order[]
   reviews      Review[]
   wishlists    Wishlist[]
+  addressLine  String?
+  city         String?
+  pincode      String?
 }
 
 model Category {
