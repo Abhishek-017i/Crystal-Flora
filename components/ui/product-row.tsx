@@ -79,7 +79,7 @@ export function ProductCard({ product }: { product: Product }) {//--------------
               return
             }
             if (wishlisted) {
-              fetch(`/api/wishlist/${product.id}`, {
+              fetch(`/api/wishlist?productId=${product.id}`, {
                 method: 'DELETE',
                 headers: { authorization: `Bearer ${token}` }
               })

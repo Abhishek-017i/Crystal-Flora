@@ -18,6 +18,14 @@ export interface SellerAnalytics {
   totalRevenue: number
 }
 
+export interface CategoryAnalytics {
+  categoryId: string
+  categoryName: string
+  productCount: number
+  totalUnitsSold: number
+  totalRevenue: number
+}
+
 export interface StatsResponse {
   totalOrders: number
   totalRevenue: number
@@ -69,6 +77,17 @@ export async function fetchVelocity(): Promise<VelocityRow[]> {
   })
   if (!res.ok) {
     throw new Error(`Failed to fetch velocity: ${res.statusText}`)
+  }
+  return res.json()
+}
+
+export async function fetchCategoryAnalytics(): Promise<CategoryAnalytics[]> {
+  const res = await fetch('/api/admin/analytics/categories', {
+    headers: getAuthHeaders(),
+    cache: 'no-store',
+  })
+  if (!res.ok) {
+    throw new Error(`Failed to fetch category analytics: ${res.statusText}`)
   }
   return res.json()
 }

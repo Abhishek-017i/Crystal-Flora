@@ -8,10 +8,15 @@ import { toast } from 'sonner'
 import { useCartStore } from '@/lib/store'
 import { Navbar } from '@/components/ui/navbar'
 import { BottomNav } from '@/components/ui/bottom-nav'
+import { useAuth } from '@/lib/useAuth'
 
 export default function CheckoutPage() {
   const router = useRouter()
   const { items, clearCart, total } = useCartStore()
+  const { user, loading: authLoading } = useAuth({
+    requireAuth: true,
+    redirectTo: '/login?next=/checkout',
+  })
 
   const [formData, setFormData] = useState({
     fullName: '',
@@ -21,15 +26,9 @@ export default function CheckoutPage() {
   })
   const [paymentMethod, setPaymentMethod] = useState<'cod' | 'online'>('cod')
   const [loading, setLoading] = useState(false)
-  const [initialLoading, setInitialLoading] = useState(true)
 
   useEffect(() => {
-    const token = localStorage.getItem('token')
-    if (!token) {
-      toast.error('Please login to proceed to checkout')
-      router.push('/login?next=/checkout')
-      return
-    }
+    if (authLoading) return
 
     if (items.length === 0) {
       toast.error('Your cart is empty')
@@ -37,24 +36,15 @@ export default function CheckoutPage() {
       return
     }
 
-    // Prefill user details if available
-    fetch('/api/auth/me', {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (!data.error) {
-          setFormData({
-            fullName: data.name || '',
-            addressLine: data.addressLine || '',
-            city: data.city || '',
-            pincode: data.pincode || '',
-          })
-        }
-      })
-      .catch(() => {})
-      .finally(() => setInitialLoading(false))
-  }, [items.length, router])
+    if (user) {
+      setFormData((prev) => ({
+        fullName: prev.fullName || user.name || '',
+        addressLine: prev.addressLine || (user as any).addressLine || '',
+        city: prev.city || (user as any).city || '',
+        pincode: prev.pincode || (user as any).pincode || '',
+      }))
+    }
+  }, [user, authLoading, items.length, router])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -131,7 +121,7 @@ export default function CheckoutPage() {
     }
   }
 
-  if (initialLoading) {
+  if (authLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />

@@ -74,7 +74,7 @@ export function PhotoCarousel({
                         return
                       }
                       if (wishlisted) {
-                        await fetch(`/api/wishlist/${productId}`, {
+                        await fetch(`/api/wishlist?productId=${productId}`, {
                           method: 'DELETE',
                           headers: { authorization: `Bearer ${token}` }
                         })

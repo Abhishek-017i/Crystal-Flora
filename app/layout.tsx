@@ -3,6 +3,7 @@ import { DM_Sans, Playfair_Display } from 'next/font/google'
 import './globals.css'
 import { WishlistProvider } from '@/components/ui/wishlist-provider'
 import { NextAuthProvider } from '@/components/ui/session-provider'
+import { Toaster } from '@/components/ui/sonner'
 
 const dmSans = DM_Sans({ 
   subsets: ["latin"],
@@ -37,6 +38,7 @@ export default function RootLayout({
       <body className={`${dmSans.variable} ${playfair.variable} font-sans antialiased`}>
         <NextAuthProvider>
           <WishlistProvider />
+          <Toaster position="top-right" richColors />
           {children}
         </NextAuthProvider>
       </body>

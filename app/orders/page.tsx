@@ -8,6 +8,7 @@ import { ArrowLeft, Package, ChevronRight, ShoppingBag, Clock } from 'lucide-rea
 import { toast } from 'sonner'
 import { Navbar } from '@/components/ui/navbar'
 import { BottomNav } from '@/components/ui/bottom-nav'
+import { useAuth } from '@/lib/useAuth'
 
 interface OrderItem {
   id: string
@@ -41,17 +42,17 @@ const statusColorMap: Record<string, { bg: string; text: string; border: string 
 
 export default function OrdersPage() {
   const router = useRouter()
+  const { user, loading: authLoading } = useAuth({
+    requireAuth: true,
+    redirectTo: '/login?next=/orders',
+  })
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const token = localStorage.getItem('token')
-    if (!token) {
-      toast.error('Please login to view your orders')
-      router.push('/login?next=/orders')
-      return
-    }
+    if (authLoading || !user) return
 
+    const token = localStorage.getItem('token')
     fetch('/api/orders/my-orders', {
       headers: { Authorization: `Bearer ${token}` },
     })

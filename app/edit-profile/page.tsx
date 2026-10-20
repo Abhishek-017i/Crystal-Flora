@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { ChevronLeft } from 'lucide-react'
+import { toast } from 'sonner'
 
 interface ProfileData {
   fullName: string
@@ -71,13 +72,13 @@ export default function EditProfilePage() {
 
       const data = await res.json()
       if (res.ok) {
-        alert('Profile updated successfully!')
+        toast.success('Profile updated successfully!')
         router.push('/profile')
       } else {
-        alert(data.error || 'Failed to update profile')
+        toast.error(data.error || 'Failed to update profile')
       }
     } catch (error) {
-      alert('Something went wrong')
+      toast.error('Something went wrong')
     } finally {
       setIsSaving(false)
     }

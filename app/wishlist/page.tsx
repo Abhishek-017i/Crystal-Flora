@@ -36,7 +36,7 @@ export default function WishlistPage() {
   const removeFromWishlist = async (id: string) => {
     const token = localStorage.getItem('token')
     if (!token) return
-    await fetch(`/api/wishlist/${id}`, {
+    await fetch(`/api/wishlist?productId=${id}`, {
       method: 'DELETE',
       headers: { authorization: `Bearer ${token}` }
     })

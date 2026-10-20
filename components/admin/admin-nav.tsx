@@ -18,15 +18,15 @@ export function AdminNav() {
   const [isOpen, setIsOpen] = useState(false)
 
   const navItems = [
-    { href: '/admin', icon: LayoutDashboard, label: 'Dashboard' },
+    { href: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { href: '/admin/products', icon: Package, label: 'Products' },
     { href: '/admin/orders', icon: ShoppingCart, label: 'Orders' },
     { href: '/admin/stats', icon: BarChart3, label: 'Analytics' },
   ]
 
   const isActive = (href: string) => {
-    if (href === '/admin') {
-      return pathname === '/admin'
+    if (href === '/admin/dashboard') {
+      return pathname === '/admin' || pathname === '/admin/dashboard'
     }
     return pathname.startsWith(href)
   }
@@ -35,7 +35,7 @@ export function AdminNav() {
     <>
       {/* Mobile Header */}
       <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-card border-b border-border flex items-center justify-between px-4 z-40">
-        <Link href="/admin" className="font-serif text-xl font-bold text-primary">
+        <Link href="/admin/dashboard" className="font-serif text-xl font-bold text-primary">
           CF Admin
         </Link>
         <button
@@ -75,7 +75,7 @@ export function AdminNav() {
 
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex md:fixed md:left-0 md:top-0 md:h-screen md:w-64 md:flex-col md:bg-card md:border-r md:border-border md:pt-6 md:z-40">
-        <Link href="/admin" className="px-6 pb-8 font-serif text-2xl font-bold text-primary">
+        <Link href="/admin/dashboard" className="px-6 pb-8 font-serif text-2xl font-bold text-primary">
           CF Admin
         </Link>
         <nav className="flex-1 px-4 space-y-2">

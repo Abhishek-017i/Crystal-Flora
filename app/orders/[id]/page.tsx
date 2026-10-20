@@ -19,9 +19,10 @@ import { toast } from 'sonner'
 import { useCartStore } from '@/lib/store'
 import { Navbar } from '@/components/ui/navbar'
 import { BottomNav } from '@/components/ui/bottom-nav'
+import { useAuth } from '@/lib/useAuth'
 
 interface OrderProduct {
-  id?: string
+  id: string
   name: string
   images: string[]
 }
@@ -62,19 +63,18 @@ export default function OrderDetailPage() {
   const router = useRouter()
   const orderId = params?.id as string
   const { addItem } = useCartStore()
+  const { user, loading: authLoading } = useAuth({
+    requireAuth: true,
+    redirectTo: `/login?next=/orders/${orderId}`,
+  })
 
   const [order, setOrder] = useState<OrderDetail | null>(null)
   const [loading, setLoading] = useState(true)
   const [errorStatus, setErrorStatus] = useState<number | null>(null)
 
   useEffect(() => {
-    if (!orderId) return
+    if (!orderId || authLoading || !user) return
     const token = localStorage.getItem('token')
-    if (!token) {
-      toast.error('Please login to view order details')
-      router.push(`/login?next=/orders/${orderId}`)
-      return
-    }
 
     fetch(`/api/orders/${orderId}`, {
       headers: { Authorization: `Bearer ${token}` },
