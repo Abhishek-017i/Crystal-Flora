@@ -215,11 +215,11 @@ export default function SignUpPage() {
             <div className="relative">
               <input
                 type="password"
-                name="password"
-                value={formData.password}
+                name="confirmPassword"
+                value={formData.confirmPassword}
                 onChange={handleChange}
                 className="w-full h-10 px-3 text-sm bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
-                placeholder="Password"
+                placeholder="Confirm Password"
               />
             </div>
             {errors.confirmPassword && (

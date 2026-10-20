@@ -3,23 +3,33 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
+  provider = "postgresql"
 }
 
 model User {
-  id           String   @id @default(cuid())
+  id           String     @id @default(cuid())
   name         String
-  email        String   @unique
+  email        String     @unique
   phone        String?
   passwordHash String
-  role         String   @default("buyer")
-  createdAt    DateTime @default(now())
+  role         String     @default("buyer")
+  createdAt    DateTime   @default(now())
   orders       Order[]
   reviews      Review[]
   wishlists    Wishlist[]
   addressLine  String?
   city         String?
   pincode      String?
+}
+
+model Seller {
+  id        String    @id @default(cuid())
+  name      String
+  email     String    @unique
+  phone     String?
+  address   String?
+  createdAt DateTime  @default(now())
+  products  Product[]
 }
 
 model Category {
@@ -30,22 +40,39 @@ model Category {
 }
 
 model Product {
-  id             String      @id @default(cuid())
-  name           String
-  description    String
-  price          Float
+  id              String         @id @default(cuid())
+  name            String
+  description     String
+  price           Float
   discountedPrice Float?
-  categoryId     String
-  category       Category    @relation(fields: [categoryId], references: [id])
-  images         String[]
-  isHighlighted  Boolean     @default(false)
-  createdAt      DateTime    @default(now())
-  orderItems     OrderItem[]
-  reviews        Review[]
-  wishlists      Wishlist[]
-  weightGrams Int     @default(200)
-  stock       Int     @default(10)
-  isInStock   Boolean @default(true)
+  categoryId      String
+  category        Category       @relation(fields: [categoryId], references: [id])
+  sellerId        String
+  seller          Seller         @relation(fields: [sellerId], references: [id])
+  images          String[]       @default([])
+  productImages   ProductImage[]
+  isHighlighted   Boolean        @default(false)
+  createdAt       DateTime       @default(now())
+  orderItems      OrderItem[]
+  reviews         Review[]
+  wishlists       Wishlist[]
+  weightGrams     Int            @default(200)
+  stock           Int            @default(10)
+  isInStock       Boolean        @default(true)
+
+  @@index([categoryId])
+  @@index([sellerId])
+}
+
+model ProductImage {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url       String
+  isPrimary Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([productId])
 }
 
 model Order {
@@ -59,36 +86,47 @@ model Order {
   pincode     String
   createdAt   DateTime    @default(now())
   items       OrderItem[]
+
+  @@index([userId])
 }
 
 model OrderItem {
-  id           String  @id @default(cuid())
-  orderId      String
-  order        Order   @relation(fields: [orderId], references: [id])
-  productId    String
-  product      Product @relation(fields: [productId], references: [id])
-  quantity     Int
-  priceAtTime  Float
+  id          String  @id @default(cuid())
+  orderId     String
+  order       Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId   String
+  product     Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+  quantity    Int
+  priceAtTime Float
+
+  @@index([orderId])
+  @@index([productId])
 }
 
 model Review {
   id        String   @id @default(cuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   productId String
-  product   Product  @relation(fields: [productId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   rating    Int
   text      String
   createdAt DateTime @default(now())
+
+  @@unique([userId, productId])
+  @@index([userId])
+  @@index([productId])
 }
 
 model Wishlist {
   id        String   @id @default(cuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   productId String
-  product   Product  @relation(fields: [productId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
 
   @@unique([userId, productId])
+  @@index([userId])
+  @@index([productId])
 }

@@ -79,6 +79,7 @@ const isEmpty = items.length === 0
             <OrderSummary subtotal={cartTotal()} total={cartTotal()} />
 
             <button 
+              onClick={() => router.push('/checkout')}
               className="w-full mt-4 text-primary-foreground py-3 rounded-full font-medium text-sm hover:opacity-90 transition-opacity text-white"
               style={{ backgroundColor: '#d4869f' }}
             >

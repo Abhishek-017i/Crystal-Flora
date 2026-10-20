@@ -14,11 +14,17 @@ export async function GET(request: Request) {
 
     const wishlist = await prisma.wishlist.findMany({
       where: { userId: decoded.id },
-      include: { product: true }
+      include: {
+        product: {
+          include: {
+            category: true,
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
     })
 
     return NextResponse.json(wishlist)
-
   } catch (error) {
     return NextResponse.json(
       { error: 'Failed to fetch wishlist' },
@@ -37,36 +43,49 @@ export async function POST(request: Request) {
       )
     }
 
-    const { productId } = await request.json()
+    const body = await request.json()
+    const { productId } = body
 
-    const existing = await prisma.wishlist.findFirst({
-      where: { userId: decoded.id, productId }
-    })
-
-    if (existing) {
+    if (!productId) {
       return NextResponse.json(
-        { error: 'Already in wishlist' },
+        { error: 'productId is required' },
         { status: 400 }
       )
     }
 
-    const item = await prisma.wishlist.create({
-      data: { userId: decoded.id, productId }
+    const existing = await prisma.wishlist.findFirst({
+      where: { userId: decoded.id, productId },
     })
 
-    return NextResponse.json(item)
+    if (existing) {
+      // Idempotent success per P2.3
+      return NextResponse.json(
+        { message: 'Already in wishlist', item: existing },
+        { status: 200 }
+      )
+    }
 
-  } catch (error) {
+    const item = await prisma.wishlist.create({
+      data: { userId: decoded.id, productId },
+    })
+
+    return NextResponse.json(item, { status: 201 })
+  } catch (error: any) {
+    if (error?.code === 'P2002') {
+      return NextResponse.json(
+        { message: 'Already in wishlist' },
+        { status: 200 }
+      )
+    }
+
     return NextResponse.json(
       { error: 'Failed to add to wishlist' },
       { status: 500 }
     )
   }
 }
-export async function DELETE(
-  request: Request,
-  { params }: { params: Promise<Record<string, string>> }
-) {
+
+export async function DELETE(request: Request) {
   try {
     const decoded = getUser(request)
     if (!decoded) {
@@ -76,17 +95,34 @@ export async function DELETE(
       )
     }
 
-    const { productId } = await params
+    const { searchParams } = new URL(request.url)
+    let productId = searchParams.get('productId')
+
+    // Also support JSON body if sent
+    if (!productId) {
+      try {
+        const body = await request.json()
+        productId = body?.productId
+      } catch {
+        // body not present
+      }
+    }
+
+    if (!productId) {
+      return NextResponse.json(
+        { error: 'productId query param or body required' },
+        { status: 400 }
+      )
+    }
 
     await prisma.wishlist.deleteMany({
       where: {
         userId: decoded.id,
-        productId
-      }
+        productId,
+      },
     })
 
     return NextResponse.json({ message: 'Removed from wishlist' })
-
   } catch (error) {
     return NextResponse.json(
       { error: 'Failed to remove from wishlist' },

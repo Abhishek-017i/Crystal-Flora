@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     const body = await request.json()
     const { productId, rating, text } = body
 
-    if (!productId || !rating || !text) {
+    if (!productId || typeof rating !== 'number' || !text) {
       return NextResponse.json(
         { error: 'Product, rating and text are required' },
         { status: 400 }
@@ -32,14 +32,14 @@ export async function POST(request: Request) {
     const existingReview = await prisma.review.findFirst({
       where: {
         userId: decoded.id,
-        productId
-      }
+        productId,
+      },
     })
 
     if (existingReview) {
       return NextResponse.json(
         { error: 'You have already reviewed this product' },
-        { status: 400 }
+        { status: 409 }
       )
     }
 
@@ -47,21 +47,27 @@ export async function POST(request: Request) {
       data: {
         userId: decoded.id,
         productId,
-        rating,
-        text
+        rating: Math.round(rating),
+        text: String(text).trim(),
       },
       include: {
         user: {
           select: {
-            name: true
-          }
-        }
-      }
+            name: true,
+          },
+        },
+      },
     })
 
-    return NextResponse.json(review)
+    return NextResponse.json(review, { status: 201 })
+  } catch (error: any) {
+    if (error?.code === 'P2002') {
+      return NextResponse.json(
+        { error: 'You have already reviewed this product' },
+        { status: 409 }
+      )
+    }
 
-  } catch (error) {
     return NextResponse.json(
       { error: 'Failed to create review' },
       { status: 500 }
