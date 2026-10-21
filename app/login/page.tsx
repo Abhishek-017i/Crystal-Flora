@@ -1,6 +1,8 @@
 "use client"
 
 import { useState } from "react"
+import Image from "next/image"
+import Link from "next/link"
 import { Eye, EyeOff } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -49,56 +51,29 @@ export default function LoginPage() {
     <main className="min-h-screen bg-background flex flex-col items-center px-6 py-12">
       {/* Logo Section */}
       <div className="w-full max-w-sm flex flex-col items-center mb-8">
-        {/* Crystal Flora Logo */}
-        <div className="mb-4">
-          <svg
-            width="80"
-            height="80"
-            viewBox="0 0 80 80"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className="text-primary"
-          >
-            {/* Decorative C and F monogram */}
-            <circle cx="40" cy="40" r="38" stroke="currentColor" strokeWidth="1.5" fill="none" opacity="0.3" />
-            <text
-              x="50%"
-              y="52%"
-              dominantBaseline="middle"
-              textAnchor="middle"
-              className="font-serif"
-              fill="currentColor"
-              fontSize="32"
-              fontFamily="Playfair Display, Georgia, serif"
-              fontStyle="italic"
-            >
-              CF
-            </text>
-            {/* Small decorative leaf */}
-            <path
-              d="M55 25 Q60 20 65 25 Q60 30 55 25"
-              fill="#6B8E6B"
-              opacity="0.8"
+        <Link href="/" className="group flex flex-col items-center transition-transform hover:scale-[1.02]">
+          {/* Crystal Flora HD Logo */}
+          <div className="relative w-24 h-24 sm:w-28 sm:h-28 mb-4 rounded-full bg-white p-1 shadow-lg shadow-black/5 ring-2 ring-primary/25 transition-shadow group-hover:shadow-xl group-hover:ring-primary/40">
+            <Image
+              src="/images/logo-hd.png"
+              alt="Crystal Flora by Sanskriti Sharma"
+              width={112}
+              height={112}
+              priority
+              className="w-full h-full object-contain rounded-full"
             />
-            <path
-              d="M58 28 Q55 32 58 36"
-              stroke="#6B8E6B"
-              strokeWidth="1"
-              fill="none"
-              opacity="0.6"
-            />
-          </svg>
-        </div>
+          </div>
 
-        {/* Brand Name */}
-        <h1 className="font-serif text-3xl text-foreground tracking-wide">
-          Crystal Flora
-        </h1>
+          {/* Brand Name */}
+          <h1 className="font-serif text-3xl sm:text-4xl text-foreground tracking-wide text-center">
+            Crystal Flora
+          </h1>
 
-        {/* Tagline */}
-        <p className="text-muted-foreground text-sm mt-1 italic">
-          {"\"Handcrafted blooms & keepsakes\""}
-        </p>
+          {/* Tagline */}
+          <p className="text-muted-foreground text-sm mt-1.5 italic tracking-wide text-center">
+            {"\"Handcrafted blooms & keepsakes\""}
+          </p>
+        </Link>
       </div>
 
       {/* Login Form Section */}

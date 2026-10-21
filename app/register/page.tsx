@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -129,11 +130,21 @@ export default function SignUpPage() {
       <div className="w-full max-w-md">
         {/* Logo and Header */}
         <div className="flex flex-col items-center mb-8">
-          <div className="mb-6 flex items-center justify-center">
-            <div className="relative w-20 h-20 border-2 border-accent rounded-full flex items-center justify-center">
-              <span className="text-2xl font-serif text-accent">CF</span>
+          <Link href="/" className="group flex flex-col items-center mb-5 transition-transform hover:scale-[1.02]">
+            <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-white p-1 shadow-lg shadow-black/5 ring-2 ring-primary/25 transition-shadow group-hover:shadow-xl group-hover:ring-primary/40">
+              <Image
+                src="/images/logo-hd.png"
+                alt="Crystal Flora by Sanskriti Sharma"
+                width={112}
+                height={112}
+                priority
+                className="w-full h-full object-contain rounded-full"
+              />
             </div>
-          </div>
+            <span className="font-serif text-2xl text-foreground tracking-wide mt-2">
+              Crystal Flora
+            </span>
+          </Link>
 
           <h1 className="text-3xl font-serif text-center mb-2">Create Account</h1>
           <p className="text-sm text-muted-foreground text-center">
